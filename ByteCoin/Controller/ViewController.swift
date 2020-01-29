@@ -32,9 +32,8 @@ class ViewController: UIViewController {
 
 // MARK: - Extensions
 
+// MARK: - PickerView Data Source and Delegate
 extension ViewController: UIPickerViewDataSource, UIPickerViewDelegate {
-  
-  // MARK: - PickerView Data Source and Delegate
   func numberOfComponents(in pickerView: UIPickerView) -> Int {
     return 1
   }
@@ -48,10 +47,8 @@ extension ViewController: UIPickerViewDataSource, UIPickerViewDelegate {
   }
   
   func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-    
     let selectedCurrency = coinManager.currencyArray[row]
     coinManager.getCoinPrice(for: selectedCurrency)
-    print(selectedCurrency)
   }
 }
 
