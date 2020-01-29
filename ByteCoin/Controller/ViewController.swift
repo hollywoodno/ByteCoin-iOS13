@@ -57,10 +57,16 @@ extension ViewController: UIPickerViewDataSource, UIPickerViewDelegate {
 // MARK: - CoinManager Delegate
 
 extension ViewController: CoinManagerDelegate {
-  func didGetLastCurrencyPrice(lastPrice: Double) {
+  func didGetLastCurrencyPrice(lastPrice: String, currency: String) {
+    
     DispatchQueue.main.async {
-      self.bitcoinLabel.text = "\(lastPrice)"
+      self.bitcoinLabel.text = lastPrice
+      self.currencyLabel.text = currency
     }
+  }
+  
+  func didFailWithError(error: Error) {
+    print("Failed to retrieve bitcoin price data: \(error)")
   }
 }
 

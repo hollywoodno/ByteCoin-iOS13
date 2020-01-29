@@ -9,7 +9,8 @@
 import Foundation
 
 protocol CoinManagerDelegate {
-  func didGetLastCurrencyPrice(lastPrice: Double)
+  func didGetLastCurrencyPrice(lastPrice: String, currency: String)
+  func didFailWithError(error: Error)
 }
 
 struct CoinManager {
@@ -19,24 +20,22 @@ struct CoinManager {
   var delegate: CoinManagerDelegate?
   
   func getCoinPrice(for currencySymbol: String) {
-    let currencyURLString = "\(baseURL)\(currencySymbol)"
-    performRequest(with: currencyURLString)
-  }
-  
-  func performRequest(with urlString: String) {
+    let urlString = "\(baseURL)\(currencySymbol)"
     
     if let requestURL = URL(string: urlString) {
       let session = URLSession(configuration: .default)
       let task = session.dataTask(with: requestURL) { (data, response, error) in
         if error != nil {
           print("Issue retrieving bitcoin data: \(String(describing: error))")
+          self.delegate?.didFailWithError(error: error!)
           return
         }
         
         if let data = data {
           let bitcoin = self.parseJSON(data)
           if let bitcoin = bitcoin {
-            self.delegate?.didGetLastCurrencyPrice(lastPrice: bitcoin.last)
+            let bitcoinString = String(format: "%.2f", bitcoin.last)
+            self.delegate?.didGetLastCurrencyPrice(lastPrice: bitcoinString, currency: currencySymbol)
           }
         }
 
@@ -54,6 +53,7 @@ struct CoinManager {
       return bitcoin
     } catch {
       print("Error parsing json: \(error)")
+      delegate?.didFailWithError(error: error)
       return nil
     }
     
