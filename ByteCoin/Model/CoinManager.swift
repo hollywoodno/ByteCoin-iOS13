@@ -8,10 +8,15 @@
 
 import Foundation
 
+protocol CoinManagerDelegate {
+  func didGetLastCurrencyPrice(lastPrice: Double)
+}
+
 struct CoinManager {
   
   let baseURL = "https://apiv2.bitcoinaverage.com/indices/global/ticker/BTC"
   let currencyArray = ["AUD", "BRL","CAD","CNY","EUR","GBP","HKD","IDR","ILS","INR","JPY","MXN","NOK","NZD","PLN","RON","RUB","SEK","SGD","USD","ZAR"]
+  var delegate: CoinManagerDelegate?
   
   func getCoinPrice(for currencySymbol: String) {
     let currencyURLString = "\(baseURL)\(currencySymbol)"
@@ -31,7 +36,7 @@ struct CoinManager {
         if let data = data {
           let bitcoin = self.parseJSON(data)
           if let bitcoin = bitcoin {
-            print("Last price for bitcoin received: \(String(describing: bitcoin.last))")
+            self.delegate?.didGetLastCurrencyPrice(lastPrice: bitcoin.last)
           }
         }
 

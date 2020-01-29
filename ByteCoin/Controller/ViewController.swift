@@ -16,7 +16,7 @@ class ViewController: UIViewController {
   @IBOutlet weak var currencyLabel: UILabel!
   @IBOutlet weak var currencyPicker: UIPickerView!
   
-  let coinManager = CoinManager()
+  var coinManager = CoinManager()
   
   // MARK: - Methods
   
@@ -25,7 +25,7 @@ class ViewController: UIViewController {
     
     currencyPicker.dataSource = self
     currencyPicker.delegate = self
-    
+    coinManager.delegate = self
   }
   
 }
@@ -33,6 +33,7 @@ class ViewController: UIViewController {
 // MARK: - Extensions
 
 // MARK: - PickerView Data Source and Delegate
+
 extension ViewController: UIPickerViewDataSource, UIPickerViewDelegate {
   func numberOfComponents(in pickerView: UIPickerView) -> Int {
     return 1
@@ -48,8 +49,18 @@ extension ViewController: UIPickerViewDataSource, UIPickerViewDelegate {
   
   func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
     let selectedCurrency = coinManager.currencyArray[row]
-    
+    self.currencyLabel.text = selectedCurrency
     coinManager.getCoinPrice(for: selectedCurrency)
+  }
+}
+
+// MARK: - CoinManager Delegate
+
+extension ViewController: CoinManagerDelegate {
+  func didGetLastCurrencyPrice(lastPrice: Double) {
+    DispatchQueue.main.async {
+      self.bitcoinLabel.text = "\(lastPrice)"
+    }
   }
 }
 
