@@ -15,7 +15,6 @@ struct CoinManager {
   
   func getCoinPrice(for currencySymbol: String) {
     let currencyURLString = "\(baseURL)\(currencySymbol)"
-    print("Request url string: \(currencyURLString)")
     performRequest(with: currencyURLString)
   }
   
@@ -25,17 +24,33 @@ struct CoinManager {
       let session = URLSession(configuration: .default)
       let task = session.dataTask(with: requestURL) { (data, response, error) in
         if error != nil {
-          print("Issue retrieving bitcoin data")
+          print("Issue retrieving bitcoin data: \(String(describing: error))")
+          return
         }
         
         if let data = data {
-          let dataString = String(data: data, encoding: String.Encoding.utf8) as String?
-          print("Retrieved bitcoin data: \(dataString)")
+          let bitcoin = self.parseJSON(data)
+          if let bitcoin = bitcoin {
+            print("Last price for bitcoin received: \(String(describing: bitcoin.last))")
+          }
         }
 
       }
       
       task.resume()
     }
+  }
+  
+  func parseJSON(_ data: Data) -> BitcoinModel? {
+    let decoder = JSONDecoder()
+    
+    do {
+      let bitcoin = try decoder.decode(BitcoinModel.self, from: data)
+      return bitcoin
+    } catch {
+      print("Error parsing json: \(error)")
+      return nil
+    }
+    
   }
 }
